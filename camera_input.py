@@ -6,6 +6,8 @@ grey_channel = False
 resize = True
 SERIAL_PORT = '/dev/ttys001'
 
+ser = serial.Serial(SERIAL_PORT, 115200)
+time.sleep(5)
 
 cap = cv2.VideoCapture(1)
 
@@ -25,12 +27,15 @@ while True:
 
     cv2.imshow('Camera Feed', frame)
 
-    # Encode and send frame data
+    # Encode the frame as JPEG
+    _, encoded_frame = cv2.imencode('.jpg', frame)
+    ser.write(encoded_frame.tobytes())
 
     # Exit on 'q' key press
     if cv2.waitKey(1) == ord('q'):
         break
 
 # When everything done, release the capture
+ser.close()
 cap.release()
 cv2.destroyAllWindows()
