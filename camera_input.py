@@ -3,10 +3,11 @@ import serial
 import time
 
 grey_channel = False
-resize = True
+resize = False
 SERIAL_PORT = '/dev/ttys001'
+BAUD_RATE = 115200
 
-ser = serial.Serial(SERIAL_PORT, 115200)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 time.sleep(5)
 
 cap = cv2.VideoCapture(1)
