@@ -1,8 +1,14 @@
 import cv2
-
-cap = cv2.VideoCapture(1)
+import serial
+import time
 
 grey_channel = False
+SERIAL_PORT = '/dev/ttys001'
+
+ser = serial.Serial(SERIAL_PORT, 115200)
+time.sleep(5)
+
+cap = cv2.VideoCapture(1)
 
 while True:
     ret, frame = cap.read()
@@ -17,10 +23,15 @@ while True:
 
     cv2.imshow('Camera Feed', frame)
 
+    # Encode and send frame data
+    _, encoded_frame = cv2.imencode('.jpg', frame)
+    ser.write(encoded_frame.tobytes())
+
     # Exit on 'q' key press
     if cv2.waitKey(1) == ord('q'):
         break
 
 # When everything done, release the capture
 cap.release()
+ser.close()
 cv2.destroyAllWindows()
