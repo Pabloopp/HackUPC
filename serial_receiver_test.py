@@ -2,7 +2,7 @@ import serial
 import numpy as np
 import cv2
 
-SERIAL_PORT = '/dev/ttys002'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 
 def decode_serial_flux():
