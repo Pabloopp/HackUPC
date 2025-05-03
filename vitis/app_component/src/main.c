@@ -20,7 +20,7 @@ void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]
 void serialize_matrix_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint8_t *raw_data, uint32_t height, uint32_t width);
 void send_uint32_big_endian(XUartPs *uart, uint32_t value);
 uint8_t clamp(float value);
-void convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
               uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]);
 
 
@@ -61,7 +61,7 @@ int main () {
         //memset(rx_buffer, 0, 2 * IMAGE_SIZE);//Clear rx buffer
         //image_size = get_image(&uart0, rx_buffer);
         //invert_image_rgb(image_matrix, height, width);
-        convolve(height, width, image_matrix, image_matrix);
+        sobel_convolve(height, width, image_matrix, image_matrix);
         serialize_matrix_rgb(image_matrix, tx_buffer, height, width);
         //free(image_matrix);
         //memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
