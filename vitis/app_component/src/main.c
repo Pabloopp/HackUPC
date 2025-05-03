@@ -18,6 +18,10 @@ void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t image_matrix[MAX_IMAGE_HEI
 void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint32_t height, uint32_t width);
 void serialize_matrix_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint8_t *raw_data, uint32_t height, uint32_t width);
 void send_uint32_big_endian(XUartPs *uart, uint32_t value);
+uint8_t clamp(float value);
+void convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+              uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]);
+
 
     uint8_t tx_buffer[MAX_IMAGE_SIZE];
     uint8_t image_buffer[MAX_IMAGE_SIZE];
@@ -55,7 +59,8 @@ int main () {
         convert_to_matrix_rgb(image_buffer, image_matrix, height, width);
         //memset(rx_buffer, 0, 2 * IMAGE_SIZE);//Clear rx buffer
         //image_size = get_image(&uart0, rx_buffer);
-        invert_image_rgb(image_matrix, height, width);
+        //invert_image_rgb(image_matrix, height, width);
+        convolve(height, width, image_matrix, image_matrix);
         serialize_matrix_rgb(image_matrix, tx_buffer, height, width);
         //free(image_matrix);
         //memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
@@ -183,6 +188,37 @@ void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]
             image_matrix[i][j][0] = 255 - image_matrix[i][j][0];  
             image_matrix[i][j][1] = 255 - image_matrix[i][j][1];  
             image_matrix[i][j][2] = 255 - image_matrix[i][j][2]; 
+        }
+    }
+}
+
+float kernel[3][3] = {
+    { -1, 0, 1 },
+    { -1, 0, 1 },
+    { -1, 0, 1 }
+};
+
+uint8_t clamp(float value) {
+    if (value < 0) return 0;
+    if (value > 255) return 255;
+    return (uint8_t)value;
+}
+
+void convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+              uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]) {
+    for (int y = 1; y < height - 1; y++) {
+        for (int x = 1; x < width - 1; x++) {
+            for (int c = 0; c < 3; c++) {
+                float sum = 0.0f;
+                for (int ky = -1; ky <= 1; ky++) {
+                    for (int kx = -1; kx <= 1; kx++) {
+                        int iy = y + ky;
+                        int ix = x + kx;
+                        sum += input[iy][ix][c] * kernel[ky + 1][kx + 1];
+                    }
+                }
+                output[y][x][c] = clamp(sum);
+            }
         }
     }
 }
