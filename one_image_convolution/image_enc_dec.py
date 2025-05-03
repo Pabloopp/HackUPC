@@ -12,9 +12,8 @@ ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 image = cv2.imread(INPUT_IMAGE_PATH)
-image = cv2.resize(image, (0, 0), fx=0.1, fy=0.1)
+image = cv2.resize(image, (0, 0), fx=0.7, fy=0.7)
 print("Image read from file: ", INPUT_IMAGE_PATH)
-
 if image is None:
     print("Error: Could not read the image.")
     exit()
@@ -23,13 +22,14 @@ if image is None:
 height, width, channels = image.shape
 b_channel, g_channel, r_channel = cv2.split(image)
 print(height.to_bytes(4, 'big'))
-serialized_image = (height.to_bytes(4, 'big') + width.to_bytes(4, 'big')
+serialized_image = (height.to_bytes(4, 'little') + width.to_bytes(4, 'little')
                     + r_channel.tobytes() + g_channel.tobytes() + b_channel.tobytes())
 print("Image size: ", height, width, channels)
 ser.write(serialized_image)
 print("Image sent to serial port.")
 
 # Read the serialized image from the serial port
+#ser.read(2)
 header = ser.read(8)
 print(header)
 if len(header) < 8:
