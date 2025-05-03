@@ -1,14 +1,5 @@
 #include "xparameters.h"
-#include <stdint.h>
 #include "xuartps.h"
-int main () {
-    volatile uint32_t *LED = (uint32_t *) XPAR_XGPIO_0_BASEADDR; //Debug led
-    *LED = 1;
-
-
-    return 1;
-}
-
 
 void init_uart(XUartPs *Uart_instance)
 {
