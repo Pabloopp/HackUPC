@@ -29,8 +29,12 @@ while True:
     cv2.imshow('Camera Feed', frame)
 
     # Encode the frame as JPEG
-    _, encoded_frame = cv2.imencode('.jpg', frame)
-    ser.write(encoded_frame.tobytes())
+    #_, encoded_frame = cv2.imencode('.jpg', frame)
+    ser.write(b'\xff\xd8')
+    ser.write(b'\xff\xd8')
+    ser.write(frame.tobytes())
+    ser.write(b'\xff\xd9')
+    ser.write(b'\xff\xd9')
 
     # Exit on 'q' key press
     if cv2.waitKey(1) == ord('q'):

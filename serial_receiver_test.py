@@ -17,28 +17,32 @@ def decode_serial_flux():
                 if ser.in_waiting > 0:
                     buffer.extend(ser.read(ser.in_waiting))
 
-                    # Look for JPEG start and end markers
-                    start_idx = buffer.find(b'\xff\xd8')  # JPEG start
-                    end_idx = buffer.find(b'\xff\xd9')   # JPEG end
+                    while True:
+                        # Look for the first valid JPEG start and end markers
+                        start_idx = buffer.find(b'\xff\xd8')  # First start marker
+                        end_idx = buffer.find(b'\xff\xd9')   # First end marker
 
-                    if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
-                        # Extract the JPEG frame
-                        jpeg_data = buffer[start_idx:end_idx + 2]
-                        buffer = buffer[end_idx + 2:]  # Remove processed data
+                        # Ensure valid start and end markers exist and are in the correct order
+                        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                            # Extract the JPEG frame
+                            jpeg_data = buffer[start_idx:end_idx + 2]
+                            buffer = buffer[end_idx + 2:]  # Remove processed data
 
-                        # Decode the JPEG frame
-                        frame = cv2.imdecode(np.frombuffer(jpeg_data, dtype=np.uint8), cv2.IMREAD_COLOR)
-                        print(frame)
+                            # Decode the JPEG frame
+                            frame = cv2.imdecode(np.frombuffer(jpeg_data, dtype=np.uint8), cv2.IMREAD_COLOR)
 
-                        if frame is not None:
-                            # Display the frame
-                            cv2.imshow('Decoded Frame', frame)
+                            if frame is not None:
+                                # Display the frame
+                                cv2.imshow('Decoded Frame', frame)
 
-                            # Exit on 'q' key press
-                            if cv2.waitKey(1) == ord('q'):
-                                break
+                                # Exit on 'q' key press
+                                if cv2.waitKey(1) == ord('q'):
+                                    return
+                            else:
+                                print("Failed to decode frame.")
                         else:
-                            print("Failed to decode frame.")
+                            # No valid frame found, exit the inner loop
+                            break
     except serial.SerialException as e:
         print(f"Serial error: {e}")
     except KeyboardInterrupt:
