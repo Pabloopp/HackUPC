@@ -4,6 +4,7 @@
 #include <string.h>
 #include "xuartps.h"
 #include "uart.h"
+#include <math.h>
 
 #define MAX_IMAGE_WIDTH  200
 #define MAX_IMAGE_HEIGHT 200
@@ -192,10 +193,16 @@ void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]
     }
 }
 
-float kernel[3][3] = {
+float sobel_gx[3][3] = {
     { -1, 0, 1 },
-    { -1, 0, 1 },
+    { -2, 0, 2 },
     { -1, 0, 1 }
+};
+
+float sobel_gy[3][3] = {
+    { -1, -2, -1 },
+    {  0,  0,  0 },
+    {  1,  2,  1 }
 };
 
 uint8_t clamp(float value) {
@@ -204,20 +211,25 @@ uint8_t clamp(float value) {
     return (uint8_t)value;
 }
 
-void convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
-              uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]) {
+void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+                    uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]) {
     for (int y = 1; y < height - 1; y++) {
         for (int x = 1; x < width - 1; x++) {
             for (int c = 0; c < 3; c++) {
-                float sum = 0.0f;
+                float gx = 0.0f;
+                float gy = 0.0f;
+
                 for (int ky = -1; ky <= 1; ky++) {
                     for (int kx = -1; kx <= 1; kx++) {
                         int iy = y + ky;
                         int ix = x + kx;
-                        sum += input[iy][ix][c] * kernel[ky + 1][kx + 1];
+                        gx += input[iy][ix][c] * sobel_gx[ky + 1][kx + 1];
+                        gy += input[iy][ix][c] * sobel_gy[ky + 1][kx + 1];
                     }
                 }
-                output[y][x][c] = clamp(sum);
+
+                float magnitude = sqrt(gx * gx + gy * gy);
+                output[y][x][c] = clamp(magnitude);
             }
         }
     }
