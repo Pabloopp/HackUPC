@@ -4,7 +4,7 @@ import numpy as np
 
 INPUT_IMAGE_PATH = 'input.jpg'
 OUTPUT_IMAGE_PATH = 'output.jpg'
-SERIAL_PORT = '/dev/ttys002'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 SERIAL_TIMEOUT = 5
 
@@ -12,6 +12,7 @@ ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 image = cv2.imread(INPUT_IMAGE_PATH)
+image = cv2.resize(image, (0, 0), fx=0.1, fy=0.1)
 print("Image read from file: ", INPUT_IMAGE_PATH)
 
 if image is None:
@@ -21,8 +22,8 @@ if image is None:
 # Serialize the image
 height, width, channels = image.shape
 b_channel, g_channel, r_channel = cv2.split(image)
-print(height.to_bytes(4, 'little'))
-serialized_image = (height.to_bytes(4, 'little') + width.to_bytes(4, 'little')
+print(height.to_bytes(4, 'big'))
+serialized_image = (height.to_bytes(4, 'big') + width.to_bytes(4, 'big')
                     + r_channel.tobytes() + g_channel.tobytes() + b_channel.tobytes())
 print("Image size: ", height, width, channels)
 ser.write(serialized_image)
@@ -35,9 +36,10 @@ if len(header) < 8:
     print("Error: Incomplete header received.")
     exit()
 
-recv_height = int.from_bytes(header[:4], 'little')
-recv_width = int.from_bytes(header[4:], 'little')
+recv_height = int.from_bytes(header[:4], 'big')
+recv_width = int.from_bytes(header[4:], 'big')
 num_pixels = recv_height * recv_width
+print(recv_height)
 expected_bytes = num_pixels * 3
 
 data = bytearray()
