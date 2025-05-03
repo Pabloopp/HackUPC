@@ -1,37 +1,56 @@
 import serial
+import cv2
+import numpy as np
 
 INPUT_IMAGE_PATH = 'input.jpg'
 OUTPUT_IMAGE_PATH = 'output.jpg'
-SERIAL_PORT = '/dev/ttyUSB0'
+SERIAL_PORT = '/dev/ttys002'
 BAUD_RATE = 115200
+SERIAL_TIMEOUT = 5
 
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
+ser.reset_input_buffer()
+ser.reset_output_buffer()
+image = cv2.imread(INPUT_IMAGE_PATH)
 
-# Send image via serial
-with open(INPUT_IMAGE_PATH, 'rb') as f:
-    img_data = f.read()
-    #ser.write(len(img_data).to_bytes(4, 'big')) # Send size
-    ser.write(img_data)
+if image is None:
+    print("Error: Could not read the image.")
+    exit()
 
-# Receive image via serial
-received_data = b''
+# Serialize the image
+height, width, channels = image.shape
+b_channel, g_channel, r_channel = cv2.split(image)
+serialized_image = (height.to_bytes(4, 'big') + width.to_bytes(4, 'big')
+                    + r_channel.tobytes() + g_channel.tobytes() + b_channel.tobytes())
 
-while True:
-    chunk = ser.read(1024)
+ser.write(serialized_image)
+print("Image sent to serial port.")
+
+# Read the serialized image from the serial port
+header = ser.read(8)
+if len(header) < 8:
+    print("Error: Incomplete header received.")
+    exit()
+
+recv_height = int.from_bytes(header[:4], 'big')
+recv_width = int.from_bytes(header[4:], 'big')
+num_pixels = recv_height * recv_width
+expected_bytes = num_pixels * 3
+
+data = bytearray()
+while len(data) < expected_bytes:
+    chunk = ser.read(expected_bytes - len(data))
     if not chunk:
-        continue
-    received_data += chunk
+        print("Error: Timeout or disconnection during image reception.")
+        exit()
+    data.extend(chunk)
 
-    # Check for JPEG end-of-image marker
-    if b'\xFF\xD9' in received_data[-2:]:
-        break
+r = np.frombuffer(data[:num_pixels], dtype=np.uint8).reshape((recv_height, recv_width))
+g = np.frombuffer(data[num_pixels:2*num_pixels], dtype=np.uint8).reshape((recv_height, recv_width))
+b = np.frombuffer(data[2*num_pixels:], dtype=np.uint8).reshape((recv_height, recv_width))
 
-eoi_index = received_data.find(b'\xFF\xD9')
-if eoi_index != -1:
-    received_data = received_data[:eoi_index + 2]
+received_image = cv2.merge([b, g, r])
 
-# Save the received image
-with open(OUTPUT_IMAGE_PATH, 'wb') as f:
-    f.write(received_data)
-
-ser.close()
+# Step 5: Save the result
+cv2.imwrite(OUTPUT_IMAGE_PATH, received_image)
+print("Received image saved to ", OUTPUT_IMAGE_PATH)
