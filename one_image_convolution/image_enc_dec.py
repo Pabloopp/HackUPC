@@ -20,10 +20,9 @@ if image is None:
 
 # Serialize the image
 height, width, channels = image.shape
-b_channel, g_channel, r_channel = cv2.split(image)
 print(height.to_bytes(4, 'big'))
-serialized_image = (height.to_bytes(4, 'little') + width.to_bytes(4, 'little')
-                    + r_channel.tobytes() + g_channel.tobytes() + b_channel.tobytes())
+header = height.to_bytes(4, 'big') + width.to_bytes(4, 'big')
+serialized_image = header + image.flatten().tobytes()
 print("Image size: ", height, width, channels)
 ser.write(serialized_image)
 print("Image sent to serial port.")
@@ -50,11 +49,7 @@ while len(data) < expected_bytes:
         exit()
     data.extend(chunk)
 
-r = np.frombuffer(data[:num_pixels], dtype=np.uint8).reshape((recv_height, recv_width))
-g = np.frombuffer(data[num_pixels:2*num_pixels], dtype=np.uint8).reshape((recv_height, recv_width))
-b = np.frombuffer(data[2*num_pixels:], dtype=np.uint8).reshape((recv_height, recv_width))
-
-received_image = cv2.merge([b, g, r])
+received_image = np.frombuffer(data, dtype=np.uint8).reshape((recv_height, recv_width, 3))
 
 cv2.imwrite(OUTPUT_IMAGE_PATH, received_image)
 print("Received image saved to ", OUTPUT_IMAGE_PATH)
