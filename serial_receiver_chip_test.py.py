@@ -1,7 +1,7 @@
 import serial
 import cv2
 
-SERIAL_PORT = '/dev/tty.usbserial-1234_tul1'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 
 def decode_serial_flux():
@@ -17,9 +17,10 @@ def decode_serial_flux():
                     buffer.extend(ser.read(ser.in_waiting))
 
                     # Iterate over the buffer and print each byte
+                    print("Start Buffer")
                     for byte in buffer:
                         print(f"Byte: {byte}")
-
+                    print("End --------------------------")
                     # Clear the buffer after printing
                     buffer.clear()
 

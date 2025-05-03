@@ -4,7 +4,7 @@ import time
 
 grey_channel = False
 resize = True
-SERIAL_PORT = '/dev/tty.usbserial-1234_tul1'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE)

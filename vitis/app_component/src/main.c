@@ -16,7 +16,7 @@ int main () {
     XUartPs uart0;
     uint8_t tx_buffer[RX_BUFF_SIZE];
     uint8_t rx_buffer[TX_BUFF_SIZE];
-    //uint8_t tmp_dbg[2];
+    uint8_t tmp_dbg[2];
     uint32_t image_size = 0;
     init_uart(&uart0);
     while (1)
@@ -25,8 +25,8 @@ int main () {
         image_size = get_image(&uart0, rx_buffer);
         memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
         
-        //tmp_dbg[0] = tx_buffer[image_size - 2];
-        //tmp_dbg[1] = tx_buffer[image_size - 1];
+        tmp_dbg[0] = tx_buffer[image_size - 2];
+        tmp_dbg[1] = tx_buffer[image_size - 1];
         send_frame(&uart0, tx_buffer, image_size);
     }
     return 1;

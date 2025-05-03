@@ -2,7 +2,7 @@ import serial
 import numpy as np
 import cv2
 
-SERIAL_PORT = '/dev/tty.usbserial-1234_tul1'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 
 def decode_serial_flux():
@@ -19,21 +19,24 @@ def decode_serial_flux():
 
                     while True:
                         # Look for the first valid JPEG start and end markers
-                        start_idx = buffer.find(b'\xff\xd8')  # First start marker
-                        end_idx = buffer.find(b'\xff\xd9')   # First end marker
+                        start_idx = buffer.find(b'\xd8\xff\xd8\xff')  # First start marker
+                        end_idx = buffer.find(b'\xff\xd9\xff\xd9')   # First end marker
 
                         # Ensure valid start and end markers exist and are in the correct order
+
                         if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                             # Extract the JPEG frame
-                            jpeg_data = buffer[start_idx:end_idx + 2]
+                            print("HEADER FOUND")
+                            frame = buffer[start_idx + 4 : end_idx]
                             buffer = buffer[end_idx + 2:]  # Remove processed data
 
                             # Decode the JPEG frame
-                            frame = cv2.imdecode(np.frombuffer(jpeg_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+                            #frame = cv2.imdecode(np.frombuffer(jpeg_data, dtype=np.uint8), cv2.IMREAD_COLOR)
 
                             if frame is not None:
                                 # Display the frame
-                                cv2.imshow('Decoded Frame', frame)
+                                print(frame)
+                                cv2.imshow('Decoded Frame', np.frombuffer(frame, dtype=np.uint8))
 
                                 # Exit on 'q' key press
                                 if cv2.waitKey(1) == ord('q'):
