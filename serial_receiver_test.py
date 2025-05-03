@@ -4,7 +4,9 @@ import cv2
 
 SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
-
+IMG_WIDTH = 64
+IMG_HEIGHT = 48
+CHANNELS = 3
 def decode_serial_flux():
     try:
         # Open the serial connection
@@ -36,11 +38,17 @@ def decode_serial_flux():
                             if frame is not None:
                                 # Display the frame
                                 print(frame)
-                                cv2.imshow('Decoded Frame', np.frombuffer(frame, dtype=np.uint8))
+                                np_frame =  np.frombuffer(frame, dtype=np.uint8)
+                                expected_size = IMG_WIDTH * IMG_HEIGHT * CHANNELS
+                                if len(np_frame) != expected_size:
+                                    print(f"Tamaño inesperado: {len(np_frame)} bytes (esperado {expected_size})")
+                                else:
+                                    np_frame = np_frame.reshape((IMG_HEIGHT, IMG_WIDTH, CHANNELS))
+                                    cv2.imshow('Decoded Frame', np_frame)
 
-                                # Exit on 'q' key press
-                                if cv2.waitKey(1) == ord('q'):
-                                    return
+                                    # Exit on 'q' key press
+                                    if cv2.waitKey(1) == ord('q'):
+                                        return
                             else:
                                 print("Failed to decode frame.")
                         else:
