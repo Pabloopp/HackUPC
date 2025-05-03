@@ -1,5 +1,5 @@
-
 #include "xparameters.h"
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include "xuartps.h"
@@ -16,20 +16,22 @@ void receive_bytes(XUartPs *uart, uint8_t *buffer, uint32_t length);
 void send_bytes(XUartPs *uart, uint8_t *buffer, uint32_t length);
 void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t ***image_matrix, uint32_t height, uint32_t width);
 void invert_image_rgb(uint8_t ***image_matrix, uint32_t height, uint32_t width);
+void serialize_matrix_rgb(uint8_t ***image_matrix, uint8_t *raw_data, uint32_t height, uint32_t width);
+void send_uint32_big_endian(XUartPs *uart, uint32_t value);
 
-
+    uint8_t tx_buffer[MAX_IMAGE_SIZE];
+    uint8_t image_buffer[MAX_IMAGE_SIZE];
 int main () {
     volatile uint32_t *LED = (uint32_t *) XPAR_XGPIO_0_BASEADDR; //Debug led
     *LED = 1;
     XUartPs uart;
-    uint8_t tx_buffer[MAX_IMAGE_SIZE];
-    uint8_t image_buffer[MAX_IMAGE_SIZE];
+    
     //uint8_t tmp_dbg[2];
     
     init_uart(&uart);
     while (1)
     {
-        uint32_t height, height_tmp = 0;
+        uint32_t height = 0;
         uint32_t width = 0;
         uint8_t h_buf[4], w_buf[4];
         receive_bytes(&uart, h_buf, 4);
@@ -38,16 +40,27 @@ int main () {
         width  = w_buf[3] | (w_buf[2] << 8) | (w_buf[1] << 16) | (w_buf[0] << 24);
         //receive_bytes(&uart, (uint8_t *)&height, 4);//Read height
         //receive_bytes(&uart, (uint8_t *)&width, 4);//Read Width
-        uint8_t image_matrix[height][width][3];
+        //uint8_t image_matrix[height][width][3];
+        uint8_t ***image_matrix = malloc(height * sizeof(uint8_t **));
+        for (int i = 0; i < height; i++) {
+            image_matrix[i] = malloc(width * sizeof(uint8_t *));
+            for (int j = 0; j < width; j++) {
+            image_matrix[i][j] = malloc(3 * sizeof(uint8_t));
+            }
+        }
         uint32_t image_size = height * width * 3;
         receive_bytes(&uart, image_buffer, image_size);//Read image
         convert_to_matrix_rgb(image_buffer, image_matrix, height, width);
         //memset(rx_buffer, 0, 2 * IMAGE_SIZE);//Clear rx buffer
         //image_size = get_image(&uart0, rx_buffer);
+        //invert_image_rgb(image_matrix, height, width);
+        serialize_matrix_rgb(image_matrix, tx_buffer, height, width);
+        free(image_matrix);
         //memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
-        invert_image_rgb(image_matrix, height, width);
-        send_bytes(&uart, (uint8_t *)&height, 4);
-        send_bytes(&uart, (uint8_t *)&width, 4);
+        send_uint32_big_endian(&uart, height);
+        send_uint32_big_endian(&uart, width);
+        //send_bytes(&uart, (uint8_t *)&height, 4);
+        //send_bytes(&uart, (uint8_t *)&width, 4);
         send_bytes(&uart, tx_buffer, image_size);
         //tmp_dbg[0] = tx_buffer[image_size - 2];
         //tmp_dbg[1] = tx_buffer[image_size - 1];
@@ -128,6 +141,14 @@ void send_bytes(XUartPs *uart, uint8_t *buffer, uint32_t length)
     }
 }
 
+void send_uint32_big_endian(XUartPs *uart, uint32_t value) {
+    uint8_t bytes[4];
+    bytes[0] = (value >> 24) & 0xFF;
+    bytes[1] = (value >> 16) & 0xFF;
+    bytes[2] = (value >> 8) & 0xFF;
+    bytes[3] = value & 0xFF;
+    send_bytes(uart, bytes, 4);
+}
 
 void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t ***image_matrix, uint32_t height, uint32_t width)
 {
@@ -139,6 +160,17 @@ void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t ***image_matrix, uint32_t 
             image_matrix[i][j][0] = raw_data[index++];
             image_matrix[i][j][1] = raw_data[index++];
             image_matrix[i][j][2] = raw_data[index++];
+        }
+    }
+}
+
+void serialize_matrix_rgb(uint8_t ***image_matrix, uint8_t *raw_data, uint32_t height, uint32_t width) {
+    int index = 0;
+    for (uint32_t i = 0; i < height; i++) {
+        for (uint32_t j = 0; j < width; j++) {
+            raw_data[index++] = image_matrix[i][j][0];  
+            raw_data[index++] = image_matrix[i][j][1];  
+            raw_data[index++] = image_matrix[i][j][2];  
         }
     }
 }
