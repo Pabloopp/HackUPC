@@ -27,6 +27,7 @@ void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEI
     uint8_t tx_buffer[MAX_IMAGE_SIZE];
     uint8_t image_buffer[MAX_IMAGE_SIZE];
     uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3];
+    uint8_t transformed_image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3];
 int main () {
     volatile uint32_t *LED = (uint32_t *) XPAR_XGPIO_0_BASEADDR; //Debug led
     *LED = 1;
@@ -61,8 +62,8 @@ int main () {
         //memset(rx_buffer, 0, 2 * IMAGE_SIZE);//Clear rx buffer
         //image_size = get_image(&uart0, rx_buffer);
         //invert_image_rgb(image_matrix, height, width);
-        sobel_convolve(height, width, image_matrix, image_matrix);
-        serialize_matrix_rgb(image_matrix, tx_buffer, height, width);
+        sobel_convolve(height, width, image_matrix, transformed_image_matrix);
+        serialize_matrix_rgb(transformed_image_matrix, tx_buffer, height, width);
         //free(image_matrix);
         //memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
         send_uint32_big_endian(&uart, height);
