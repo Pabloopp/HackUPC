@@ -5,8 +5,8 @@
 #include "xuartps.h"
 #include "uart.h"
 
-#define MAX_IMAGE_WIDTH  800
-#define MAX_IMAGE_HEIGHT 600
+#define MAX_IMAGE_WIDTH  200
+#define MAX_IMAGE_HEIGHT 200
 #define MAX_IMAGE_SIZE (MAX_IMAGE_WIDTH * MAX_IMAGE_HEIGHT * 3)
 
 void init_uart(XUartPs *uart_instance);
@@ -14,13 +14,14 @@ uint32_t get_image(XUartPs *uart, uint8_t *buff);
 void send_frame(XUartPs *uart, const u8 *frame_buffer, u32 length);
 void receive_bytes(XUartPs *uart, uint8_t *buffer, uint32_t length);
 void send_bytes(XUartPs *uart, uint8_t *buffer, uint32_t length);
-void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t ***image_matrix, uint32_t height, uint32_t width);
-void invert_image_rgb(uint8_t ***image_matrix, uint32_t height, uint32_t width);
-void serialize_matrix_rgb(uint8_t ***image_matrix, uint8_t *raw_data, uint32_t height, uint32_t width);
+void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint32_t height, uint32_t width);
+void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint32_t height, uint32_t width);
+void serialize_matrix_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint8_t *raw_data, uint32_t height, uint32_t width);
 void send_uint32_big_endian(XUartPs *uart, uint32_t value);
 
     uint8_t tx_buffer[MAX_IMAGE_SIZE];
     uint8_t image_buffer[MAX_IMAGE_SIZE];
+    uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3];
 int main () {
     volatile uint32_t *LED = (uint32_t *) XPAR_XGPIO_0_BASEADDR; //Debug led
     *LED = 1;
@@ -40,22 +41,23 @@ int main () {
         width  = w_buf[3] | (w_buf[2] << 8) | (w_buf[1] << 16) | (w_buf[0] << 24);
         //receive_bytes(&uart, (uint8_t *)&height, 4);//Read height
         //receive_bytes(&uart, (uint8_t *)&width, 4);//Read Width
-        //uint8_t image_matrix[height][width][3];
-        uint8_t ***image_matrix = malloc(height * sizeof(uint8_t **));
+        //uint8_t ***image_matrix = malloc(height * sizeof(uint8_t **));
+        /*
         for (int i = 0; i < height; i++) {
             image_matrix[i] = malloc(width * sizeof(uint8_t *));
             for (int j = 0; j < width; j++) {
             image_matrix[i][j] = malloc(3 * sizeof(uint8_t));
             }
-        }
+        }*/
+
         uint32_t image_size = height * width * 3;
         receive_bytes(&uart, image_buffer, image_size);//Read image
         convert_to_matrix_rgb(image_buffer, image_matrix, height, width);
         //memset(rx_buffer, 0, 2 * IMAGE_SIZE);//Clear rx buffer
         //image_size = get_image(&uart0, rx_buffer);
-        //invert_image_rgb(image_matrix, height, width);
+        invert_image_rgb(image_matrix, height, width);
         serialize_matrix_rgb(image_matrix, tx_buffer, height, width);
-        free(image_matrix);
+        //free(image_matrix);
         //memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
         send_uint32_big_endian(&uart, height);
         send_uint32_big_endian(&uart, width);
@@ -150,7 +152,7 @@ void send_uint32_big_endian(XUartPs *uart, uint32_t value) {
     send_bytes(uart, bytes, 4);
 }
 
-void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t ***image_matrix, uint32_t height, uint32_t width)
+void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint32_t height, uint32_t width)
 {
     int index = 0;
     for (int i = 0; i < height; i++)
@@ -164,7 +166,7 @@ void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t ***image_matrix, uint32_t 
     }
 }
 
-void serialize_matrix_rgb(uint8_t ***image_matrix, uint8_t *raw_data, uint32_t height, uint32_t width) {
+void serialize_matrix_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint8_t *raw_data, uint32_t height, uint32_t width) {
     int index = 0;
     for (uint32_t i = 0; i < height; i++) {
         for (uint32_t j = 0; j < width; j++) {
@@ -175,7 +177,7 @@ void serialize_matrix_rgb(uint8_t ***image_matrix, uint8_t *raw_data, uint32_t h
     }
 }
 
-void invert_image_rgb(uint8_t ***image_matrix, uint32_t height, uint32_t width) {
+void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint32_t height, uint32_t width) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             image_matrix[i][j][0] = 255 - image_matrix[i][j][0];  
