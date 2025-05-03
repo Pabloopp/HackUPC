@@ -1,39 +1,23 @@
 #include "xparameters.h"
 #include <stdint.h>
+#include <string.h>
 #include "xuartps.h"
+#include "uart.h"
 int main () {
     volatile uint32_t *LED = (uint32_t *) XPAR_XGPIO_0_BASEADDR; //Debug led
     *LED = 1;
-
-
+    XUartPs *uart0;
+    uint8_t tx_buffer[RX_BUFF_SIZE];
+    uint8_t rx_buffer[TX_BUFF_SIZE];
+    uint32_t image_size = 0;
+    init_uart(uart0);
+    while (1)
+    {
+        memset(rx_buffer, 0, sizeof(rx_buffer));//Clear rx buffer
+        image_size = get_image(uart0, rx_buffer);
+        memcpy(tx_buffer, rx_buffer, sizeof(rx_buffer));
+        send_frame(uart0, tx_buffer, image_size);
+    }
     return 1;
 }
 
-
-void init_uart(XUartPs *Uart_instance)
-{
-    XUartPs_Config *Uart_config = XUartPs_LookupConfig(XPAR_UART0_BASEADDR);
-    XUartPs_CfgInitialize(Uart_instance, Uart_config, Uart_config ->BaseAddress);
-    //TODO set higher baudrate? currently default config
-}
-
-void get_image(XUartPs *Uart, uint8_t *buff)
-{
-    uint8_t r_byte = 0;
-    uint8_t r_byte_prev = 0;
-    uint64_t i = 2;
-    while (r_byte != 0xD8 && r_byte_prev != 0xFF)
-    {
-        r_byte_prev = r_byte;
-        r_byte = XUartPs_RecvByte(Uart->Config.BaseAddress);
-    }
-    buff[0] = 0xFF;
-    buff[1] = 0xD8;
-    while (r_byte != 0xD9 && r_byte_prev != 0xFF)
-    {
-        r_byte_prev = r_byte;
-        r_byte = XUartPs_RecvByte(Uart->Config.BaseAddress);
-        buff[i] = r_byte;
-        i++;
-    }
-}
