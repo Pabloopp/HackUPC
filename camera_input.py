@@ -26,7 +26,6 @@ while True:
         # Convert to grayscale
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    print(frame)
     cv2.imshow('Camera Feed', frame)
 
     # Encode the frame as JPEG

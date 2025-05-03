@@ -1,0 +1,14 @@
+11:37:43 INFO  : updated workspace path: 
+11:37:43 INFO  : bash, -c, source /tools/Xilinx/Vitis/2024.2/tps/lnx64/lopper-1.1.0/env/bin/activate && python /tools/Xilinx/Vitis/2024.2/data/embeddedsw/scripts/pyesw//repo.py -st  /tools/Xilinx/Vitis/2024.2/data/embeddedsw && deactivate
+11:37:44 INFO  : Successfully created repository data at /tmp/rigel_lopper_pablo4080186102479276574
+11:37:44 INFO  : bash, -c, source /tools/Xilinx/Vitis/2024.2/tps/lnx64/lopper-1.1.0/env/bin/activate && python /tools/Xilinx/Vitis/2024.2/data/embeddedsw/scripts/pyesw//get_template_data.py -d /tmp/rigel_lopper_pablo2105003747279683970 -r /tmp/rigel_lopper_pablo4080186102479276574/.repo.yaml && deactivate
+11:37:44 INFO  : Embedded Template List generated successfully
+11:38:03 INFO  : bash, -c, source /tools/Xilinx/Vitis/2024.2/tps/lnx64/lopper-1.1.0/env/bin/activate && python /tools/Xilinx/Vitis/2024.2/data/embeddedsw/scripts/pyesw//repo.py -st  /tools/Xilinx/Vitis/2024.2/data/embeddedsw && deactivate
+11:38:03 INFO  : created .gitignore file for the project /home/pablo/Documents/HackUPC/vitis
+12:25:07 INFO  : updated workspace path: 
+12:25:07 INFO  : bash, -c, source /tools/Xilinx/Vitis/2024.2/tps/lnx64/lopper-1.1.0/env/bin/activate && python /tools/Xilinx/Vitis/2024.2/data/embeddedsw/scripts/pyesw//repo.py -st  /tools/Xilinx/Vitis/2024.2/data/embeddedsw && deactivate
+12:25:08 INFO  : Successfully created repository data at /tmp/rigel_lopper_pablo5799368118964844195
+12:25:08 INFO  : bash, -c, source /tools/Xilinx/Vitis/2024.2/tps/lnx64/lopper-1.1.0/env/bin/activate && python /tools/Xilinx/Vitis/2024.2/data/embeddedsw/scripts/pyesw//get_template_data.py -d /tmp/rigel_lopper_pablo2255914051138847860 -r /tmp/rigel_lopper_pablo5799368118964844195/.repo.yaml && deactivate
+12:25:09 INFO  : Embedded Template List generated successfully
+12:33:42 INFO  : bash, -c, source /tools/Xilinx/Vitis/2024.2/tps/lnx64/lopper-1.1.0/env/bin/activate && python /tools/Xilinx/Vitis/2024.2/data/embeddedsw/scripts/pyesw//repo.py -st  /tools/Xilinx/Vitis/2024.2/data/embeddedsw && deactivate
+12:33:42 INFO  : created .gitignore file for the project /home/pablo/Documents/HackUPC/vitis
