@@ -21,7 +21,8 @@ if image is None:
 # Serialize the image
 height, width, channels = image.shape
 b_channel, g_channel, r_channel = cv2.split(image)
-serialized_image = (height.to_bytes(4, 'big') + width.to_bytes(4, 'big')
+print(height.to_bytes(4, 'little'))
+serialized_image = (height.to_bytes(4, 'little') + width.to_bytes(4, 'little')
                     + r_channel.tobytes() + g_channel.tobytes() + b_channel.tobytes())
 print("Image size: ", height, width, channels)
 ser.write(serialized_image)
@@ -34,8 +35,8 @@ if len(header) < 8:
     print("Error: Incomplete header received.")
     exit()
 
-recv_height = int.from_bytes(header[:4], 'big')
-recv_width = int.from_bytes(header[4:], 'big')
+recv_height = int.from_bytes(header[:4], 'little')
+recv_width = int.from_bytes(header[4:], 'little')
 num_pixels = recv_height * recv_width
 expected_bytes = num_pixels * 3
 
