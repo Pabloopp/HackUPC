@@ -2,8 +2,8 @@ import serial
 import cv2
 import numpy as np
 
-INPUT_IMAGE_PATH = 'input.jpg'
-OUTPUT_IMAGE_PATH = 'output.jpg'
+INPUT_IMAGE_PATH = 'input2.jpg'
+OUTPUT_IMAGE_PATH = 'output2.jpg'
 SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 SERIAL_TIMEOUT = 5
@@ -12,7 +12,7 @@ ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 image = cv2.imread(INPUT_IMAGE_PATH)
-image = cv2.resize(image, (0, 0), fx=0.7, fy=0.7)
+image = cv2.resize(image, (0, 0), fx=0.3, fy=0.3)
 print("Image read from file: ", INPUT_IMAGE_PATH)
 if image is None:
     print("Error: Could not read the image.")
