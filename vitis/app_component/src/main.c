@@ -138,10 +138,37 @@ float sobel_gy[3][3] = {
     {  1,  2,  1 }
 };
 
+float sharpen_kernel[3][3] = {
+    { 0, -1, 0 },
+    { -1, 5, -1 },
+    { 0, -1, 0 }
+};
+
 uint8_t clamp(float value) {
     if (value < 0) return 0;
     if (value > 255) return 255;
     return (uint8_t)value;
+}
+
+void convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+              uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], float kernel[3][3]) {
+    for (int y = 1; y < height - 1; y++) {
+        for (int x = 1; x < width - 1; x++) {
+            for (int c = 0; c < 3; c++) {
+                float sum = 0.0f;
+
+                for (int ky = -1; ky <= 1; ky++) {
+                    for (int kx = -1; kx <= 1; kx++) {
+                        int iy = y + ky;
+                        int ix = x + kx;
+                        sum += input[iy][ix][c] * kernel[ky + 1][kx + 1];
+                    }
+                }
+
+                output[y][x][c] = clamp(sum);
+            }
+        }
+    }
 }
 
 void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
