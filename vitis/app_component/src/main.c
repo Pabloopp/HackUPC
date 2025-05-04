@@ -5,6 +5,8 @@
 #include "xuartps.h"
 #include "uart.h"
 #include <math.h>
+#include <time.h>
+#include <stdio.h>
 
 #define MAX_IMAGE_WIDTH  200
 #define MAX_IMAGE_HEIGHT 200
@@ -20,8 +22,9 @@ void invert_image_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]
 void serialize_matrix_rgb(uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint8_t *raw_data, uint32_t height, uint32_t width);
 void send_uint32_big_endian(XUartPs *uart, uint32_t value);
 uint8_t clamp(float value);
-void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+double sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
               uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]);
+void send_double_big_endian(XUartPs *uart, double value);
 
 
     uint8_t tx_buffer[MAX_IMAGE_SIZE];
@@ -62,10 +65,11 @@ int main () {
         //memset(rx_buffer, 0, 2 * IMAGE_SIZE);//Clear rx buffer
         //image_size = get_image(&uart0, rx_buffer);
         //invert_image_rgb(image_matrix, height, width);
-        sobel_convolve(height, width, image_matrix, transformed_image_matrix);
+        double conv_time = sobel_convolve(height, width, image_matrix, transformed_image_matrix);
         serialize_matrix_rgb(transformed_image_matrix, tx_buffer, height, width);
         //free(image_matrix);
         //memcpy(tx_buffer, rx_buffer, TX_BUFF_SIZE);
+        send_double_big_endian(&uart, conv_time);
         send_uint32_big_endian(&uart, height);
         send_uint32_big_endian(&uart, width);
         //send_bytes(&uart, (uint8_t *)&height, 4);
@@ -159,6 +163,20 @@ void send_uint32_big_endian(XUartPs *uart, uint32_t value) {
     send_bytes(uart, bytes, 4);
 }
 
+void send_double_big_endian(XUartPs *uart, double value) {
+    uint8_t bytes[8];
+    uint64_t *value_as_int = (uint64_t *)&value; // Interpret the double as a 64-bit integer
+    bytes[0] = (*value_as_int >> 56) & 0xFF;
+    bytes[1] = (*value_as_int >> 48) & 0xFF;
+    bytes[2] = (*value_as_int >> 40) & 0xFF;
+    bytes[3] = (*value_as_int >> 32) & 0xFF;
+    bytes[4] = (*value_as_int >> 24) & 0xFF;
+    bytes[5] = (*value_as_int >> 16) & 0xFF;
+    bytes[6] = (*value_as_int >> 8) & 0xFF;
+    bytes[7] = *value_as_int & 0xFF;
+    send_bytes(uart, bytes, 8);
+}
+
 void convert_to_matrix_rgb(uint8_t *raw_data, uint8_t image_matrix[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3], uint32_t height, uint32_t width)
 {
     int index = 0;
@@ -214,6 +232,7 @@ uint8_t clamp(float value) {
 
 void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
                     uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]) {
+    clock_t start_time = clock();
     for (int y = 1; y < height - 1; y++) {
         for (int x = 1; x < width - 1; x++) {
             for (int c = 0; c < 3; c++) {
@@ -234,4 +253,7 @@ void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEI
             }
         }
     }
+    clock_t end_time = clock();
+    double elapsed_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+    return elapsed_time;
 }
