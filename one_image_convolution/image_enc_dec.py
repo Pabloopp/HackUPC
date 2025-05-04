@@ -13,6 +13,7 @@ ser.reset_input_buffer()
 ser.reset_output_buffer()
 image = cv2.imread(INPUT_IMAGE_PATH)
 image = cv2.resize(image, (0, 0), fx=0.7, fy=0.7)
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 print("Image read from file: ", INPUT_IMAGE_PATH)
 if image is None:
     print("Error: Could not read the image.")
