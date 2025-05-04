@@ -29,14 +29,15 @@ print("Image sent to serial port.")
 
 # Read the serialized image from the serial port
 #ser.read(2)
-header = ser.read(8)
+header = ser.read(16)
 print(header)
-if len(header) < 8:
+if len(header) < 16:
     print("Error: Incomplete header received.")
     exit()
 
-recv_height = int.from_bytes(header[:4], 'big')
-recv_width = int.from_bytes(header[4:], 'big')
+convolution_time = np.double.from_bytes(header[:8], 'big')
+recv_height = int.from_bytes(header[8:12], 'big')
+recv_width = int.from_bytes(header[12:16], 'big')
 num_pixels = recv_height * recv_width
 print(recv_height)
 expected_bytes = num_pixels * 3
@@ -53,3 +54,4 @@ received_image = np.frombuffer(data, dtype=np.uint8).reshape((recv_height, recv_
 
 cv2.imwrite(OUTPUT_IMAGE_PATH, received_image)
 print("Received image saved to ", OUTPUT_IMAGE_PATH)
+print("Convolution processing time: ", convolution_time)
