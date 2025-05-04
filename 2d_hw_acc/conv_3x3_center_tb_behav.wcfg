@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="conv_3x3_center_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="conv_3x3_center_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="122.400 ns"></ZoomStartTime>
+      <ZoomEndTime time="191.501 ns"></ZoomEndTime>
+      <Cursor1Time time="155.200 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="165"></NameColumnWidth>
+      <ValueColumnWidth column_width="122"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject type="logic" fp_name="/conv_3x3_center_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/conv_3x3_center_tb/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/conv_3x3_center_tb/start">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/conv_3x3_center_tb/pixels_in">
+      <obj_property name="ElementShortName">pixels_in[71:0]</obj_property>
+      <obj_property name="ObjectShortName">pixels_in[71:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/conv_3x3_center_tb/pixel_out">
+      <obj_property name="ElementShortName">pixel_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/conv_3x3_center_tb/done">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/conv_3x3_center_tb/CLK_PERIOD">
+      <obj_property name="ElementShortName">CLK_PERIOD</obj_property>
+      <obj_property name="ObjectShortName">CLK_PERIOD</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/conv_3x3_center_tb/uut/state">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+</wave_config>

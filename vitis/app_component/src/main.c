@@ -230,7 +230,7 @@ uint8_t clamp(float value) {
     return (uint8_t)value;
 }
 
-void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
+double sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3],
                     uint8_t output[MAX_IMAGE_HEIGHT][MAX_IMAGE_WIDTH][3]) {
     clock_t start_time = clock();
     for (int y = 1; y < height - 1; y++) {
@@ -254,6 +254,7 @@ void sobel_convolve(uint32_t height, uint32_t width, uint8_t input[MAX_IMAGE_HEI
         }
     }
     clock_t end_time = clock();
-    double elapsed_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+    double elapsed_time = (double)((end_time - start_time) / CLOCKS_PER_SEC);
     return elapsed_time;
+                    
 }

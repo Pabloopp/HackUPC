@@ -109,6 +109,7 @@ set(USER_LINK_OMIT_ALL_SYMBOL_INFO "")
 # User needs to update USER_LINK_DIRECTORIES below with these library search paths.
 set(USER_LINK_LIBRARIES
 "-lm"
+"-lrt"
 )
 
 # Add any directories to look for the libraries to be linked.

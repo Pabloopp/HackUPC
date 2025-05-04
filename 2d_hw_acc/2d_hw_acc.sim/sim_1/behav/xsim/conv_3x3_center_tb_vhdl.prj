@@ -1,0 +1,7 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../2d_hw_acc.srcs/sources_1/new/conv_module.vhd" \
+"../../../../2d_hw_acc.srcs/sim_1/new/conv_module_tb.vhd" \
+
+# Do not sort compile order
+nosort

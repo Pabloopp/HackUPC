@@ -1,0 +1,4 @@
+Running: xsim.dir/conv_3x3_center_tb_behav/xsimk -simmode gui -wdb conv_3x3_center_tb_behav.wdb -simrunnum 0 -socket 33253
+Design successfully loaded
+Design Loading Memory Usage: 180312 KB (Peak: 180364 KB)
+Design Loading CPU Usage: 820 ms

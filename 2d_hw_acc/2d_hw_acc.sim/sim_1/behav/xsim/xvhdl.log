@@ -1,0 +1,2 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/pablo/Documents/HackUPC/2d_hw_acc/2d_hw_acc.srcs/sim_1/new/conv_module_tb.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'conv_3x3_center_tb'
