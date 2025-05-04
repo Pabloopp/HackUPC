@@ -28,7 +28,7 @@ ser.write(serialized_image)
 print("Image sent to serial port.")
 
 # Read the serialized image from the serial port
-#ser.read(2)
+
 header = ser.read(8)
 print(header)
 if len(header) < 8:
@@ -38,7 +38,6 @@ if len(header) < 8:
 recv_height = int.from_bytes(header[:4], 'big')
 recv_width = int.from_bytes(header[4:], 'big')
 num_pixels = recv_height * recv_width
-print(recv_height)
 expected_bytes = num_pixels * 3
 
 data = bytearray()

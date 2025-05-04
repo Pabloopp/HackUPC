@@ -1,0 +1,9 @@
+#
+# An unexpected error has occurred (11)
+#
+Stack:
+/tools/Xilinx/Vivado/2024.2/tps/lnx64/jre21.0.1_12/lib//server/libjvm.so(+0xe4f55c) [0x7931cf84f55c]
+/tools/Xilinx/Vivado/2024.2/tps/lnx64/jre21.0.1_12/lib//server/libjvm.so(JVM_handle_linux_signal+0x23e) [0x7931cf85002e]
+/lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x793209c45330]
+/tools/Xilinx/Vivado/2024.2/lib/lnx64.o/libxv_rsb.so(Java_ui_data_rsbi_RSBBlockInterface_1getName+0x3e) [0x7931ef2a64fe]
+[0x7931c08f56ea]

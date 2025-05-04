@@ -3,7 +3,7 @@
   "type": "PLATFORM",
   "configuration": {
     "description": "",
-    "xsa": "/home/pablo/Documents/HackUPC/base_ps/design_1_wrapper.xsa",
+    "xsa": "/home/pablo/Documents/HackUPC/2d_hw_acc/design_1_wrapper.xsa",
     "xsaPathInPlatform": "platform/hw/design_1_wrapper.xsa",
     "emulationXsa": "",
     "emulationXsaPathInPlatform": "",
